@@ -5,6 +5,12 @@
 #include <stdlib.h>
 #include <string.h>
 
+typedef struct DATE {
+    int day;
+    int month;
+    int year;
+} date;
+
 int check_mass(int input[], int s) {
     int n = s,
     a[n];
@@ -16,6 +22,17 @@ int check_mass(int input[], int s) {
         return 0;
     }
     return 1;
+}
+
+int string_to_int(char* string, int size) {
+    if (size == 1 && *string == '-') {
+        return -1;
+    }
+    if (size == 1) {
+        return (*string - 0x30);
+    }
+    return string[size - 1] - 0x30
+    + 10 * string_to_int(string, size - 1);
 }
 
 void numberSort(int arr[], int l, int r) {
@@ -121,6 +138,90 @@ int rvocabularySort() {
         std::cout << strings[i] << std::endl;
     }
     return 0;
+}
+
+int dateSort() {
+    int i = 0;
+    int j = 0;
+    int size;
+    FILE *f1,
+    *f2;
+    f1 = fopen("../thirdparty/datetest.txt", "r");
+    fseek(f1, 0, SEEK_END);
+    size = ftell(f1);
+    fseek(f1, 0, SEEK_SET);
+    char* file_dates = new char[size];
+    date* arr = new date[size];
+    if (f1 != NULL) {
+        while (feof(f1) == 0) {
+            fscanf(f1, "%c", &file_dates[i]);
+            i++;
+        }
+        fclose(f1);
+        size = size / 11;
+        for (i = 0; i < size; i++) {
+            arr[i].day = 0;
+            arr[i].month = 0;
+            arr[i].year = 0;
+            int counter = 10;
+            while (file_dates[j] != '-') {
+                arr[i].day = string_to_int((file_dates + j), 1) * counter + arr[i].day;
+                j++;
+                counter = counter / 10;
+            }
+            j++;
+            counter = 10;
+            while (file_dates[j] != '-') {
+                arr[i].month = string_to_int((file_dates + j), 1) * counter + arr[i].month;
+                j++;
+                counter = counter / 10;
+            }
+            j++;
+            counter = 1000;
+            while (file_dates[j] != ' ') {
+                arr[i].year = string_to_int((file_dates + j), 1) * counter + arr[i].year;
+                j++;
+                counter = counter / 10;
+            }
+            j++;
+        }
+        std::cout << "Array, before sorting:";
+        for (i = 0; i < size; i++) {
+            std::cout << arr[i].day;
+            std::cout << "-";
+            std::cout << arr[i].month;
+            std::cout << "-";
+            std::cout << arr[i].year;
+            std::cout << " ";
+        }
+        std::cout << std::endl;
+        for (i = size - 1; i >= 0; i--) {
+            for (j = 0; j < i; j++) {
+                if ((arr[j].year * 10000) + (arr[j].month * 100) + (arr[j].day) > (arr[j + 1].year * 10000) + (arr[j + 1].month * 100) + (arr[j + 1].day)) {
+                    date tmp = arr[j];
+                    arr[j] = arr[j + 1];
+                    arr[j + 1] = tmp;
+                }
+            }
+        }
+        f2 = fopen("../thirdparty/dateres.txt", "w");
+        std::cout << "Array written to file:";
+        for (i = 0; i < size; i++) {
+            fprintf(f2, "%d", arr[i].day);
+            std::cout << arr[i].day;
+            fprintf(f2, "-");
+            std::cout << "-";
+            fprintf(f2, "%d", arr[i].month);
+            std::cout << arr[i].month;
+            fprintf(f2, "-");
+            std::cout << "-";
+            fprintf(f2, "%d", arr[i].year);
+            std::cout << arr[i].year;
+            fprintf(f2, " ");
+            std::cout << " ";
+        }
+    }
+    return (0);
 }
 
 void rmassSort() {

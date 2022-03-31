@@ -9,6 +9,8 @@ int vocabularySort();
 
 int rvocabularySort();
 
+int dateSort();
+
 void rmassSort();
 
 void massSort();

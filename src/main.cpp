@@ -42,6 +42,11 @@ int main(int argc, char* argv[]) {
             std::cout << std::endl;
             return 0;
         }
+        if(argv[1][0] == '-' && argv[1][1] ='d') {
+            dateSort();
+            std::cout << std::endl;
+            return 0;
+        }
         printHelp();
     }
 }
