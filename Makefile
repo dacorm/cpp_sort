@@ -1,34 +1,75 @@
-all: bin/Sorting-the-input-data
+# compiler
+CC = g++
 
-bin/Sorting-the-input-data: build/src/main.o build/src/sorts.o
-	gcc -Wall -Werror build/src/main.o build/src/sorts.o -o bin/Sorting-the-input-data
+# compiler flags:
+# -Wall = basic warning aggregator
+# -Wextra = additional warning aggregator
+# -Wpedantic = verification of compliance with the standard
+# -Werror = all warnings become errors
+CFLAGS = -Wall -Wextra -Wpedantic -Werror
 
-build/src/main.o: src/main.c src/sorts.h
-	gcc -Wall -Werror -c src/main.c -o build/src/main.o
+# generating dependencies and the path to the directory with files for building the application
+CPPFLAGS = -MMD -I src
 
-build/src/sorts.o: src/sorts.c src/sorts.h
-	gcc -Wall -Werror -c src/sorts.c -o build/src/sorts.o
+# generating dependencies and the path to the directory with files for building the test
+CPPFLAGS_TEST = -MP -MMD -I src -I thirdparty
 
-test: build/test build/test/main_test.o build/test/sort_test.o
-	gcc -Wall -Werror build/test/*.o build/src/sorts.o -o bin/test
+APPLICATION_NAME = sort
+APPLICATION_LIB = lib_sort
+TEST_NAME = test_sort
 
-build/test:
-	mkdir -p build/test
+SRC = src
+BIN = bin
+OBJ = build
+TEST = test
 
-build/test/main_test.o: test/main_test.c
-	gcc -Wall -Werror -c test/main_test.c -o build/test/main_test.o
+APPLICATION_PATH = $(BIN)/$(APPLICATION_NAME)
+LIBRARY_PATH = $(OBJ)/$(SRC)/$(APPLICATION_LIB)/$(APPLICATION_LIB).a
+TEST_PATH = $(BIN)/$(TEST_NAME)
 
-build/test/sort_test.o: test/sort_test.c
-	gcc -Wall -Werror -c test/sort_test.c -o build/test/sort_test.o
+APPLICATION_SRC = $(shell find $(SRC)/$(APPLICATION_NAME) -name '*.cpp')
+APPLICATION_OBJ = $(APPLICATION_SRC:$(SRC)/%.cpp=$(OBJ)/$(SRC)/%.o)
 
+LIBRARY_SRC = $(shell find $(SRC)/$(APPLIACATION_LIB) -name '*.cpp')
+LIBRARY_OBJ = $(LIBRARY_SRC:$(SRC)/%.cpp=$(OBJ)/$(SRC)/%.o)
+
+TEST_SRC = $(shell find $(TEST) -name '*.cpp')
+TEST_OBJ = $(TEST_SRC:$(TEST)/%.cpp=$(OBJ)/$(TEST)/%.o)
+
+DEPENDENCIES = $(APPLICATION_OBJ:.o=.d)
+TEST_DEPENDENCIES = $(TEST_OBJ:.o=.d)
+
+# building the app
+.PHONY: all
+all: $(APPLICATION_PATH)
+-include $(DEPENDENCIES)
+
+$(APPLICATION_PATH): $(APPLICATION_OBJ) $(LIBRARY_PATH)
+	$(CC) $(CFLAGS) $(CPPFLAGS) -o $@ $^
+	
+$(OBJ)/%.o: %.cpp
+	$(CC) -c $(CFLAGS) $(CPPFLAGS) -o $@ $<
+	
+$(LIBRARY_PATH): $(LIBRARY_OBJ)
+	ar rcs $@ $^
+	
+# build and run tests
+.PHONY: test
+test: $(TEST_PATH)
+	./$(TEST_PATH)
+	
+-include $(TEST_DEPENDENCIES)
+
+$(TEST_PATH): $(TEST_OBJ) $(LIBRARY_PATH)
+	$(CC) $(CFLAGS) $(CPPFLAGS_TEST) -o $@ $^
+
+$(OBJ)/$(TEST)%.o: $(TEST)/%.cpp
+	$(CC) -c $(CFLAGS) $(CPPFLAGS_TEST) -o $@ $<
+
+# clearing the build files
+.PHONY: clean
 clean:
-
-	rm -rf build/src/*.o bin/Sorting-the-input-data bin/test
-
-.PHONY: clean all
-
-run:
-	./bin/Sorting-the-input-data
-
-run_test:
-	./bin/test
+	$(RM) $(APPLICATION_PATH) $(TEST_PATH)
+	find $(OBJ) -name '*.o' -exec $(RM) '{}' \;
+	find $(OBJ) -name '*.d' -exec $(RM) '{}' \;
+	find $(OBJ) -name '*.a' -exec $(RM) '{}' \;

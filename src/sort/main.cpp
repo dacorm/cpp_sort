@@ -1,5 +1,5 @@
-#include "../lib_sort/sorts.h"
-#include "../lib_sort/args.h"
+#include "sorts.h"
+#include "args.h"
 
 #include <iostream>
 
@@ -30,7 +30,7 @@ int main(int argc, char* argv[]) {
             rmassSort();
             return 0;
         }
-        if(argv[1][0] == '-' && argv[1][1] =='t') {
+        if(argv[1][0] == '-' && argv[1][1] ='t') {
             std::cout << "Sorted alphabetically, case-sensitive words:" << std::endl;
             vocabularySort();
             std::cout << std::endl;
@@ -42,7 +42,7 @@ int main(int argc, char* argv[]) {
             std::cout << std::endl;
             return 0;
         }
-        if(argv[1][0] == '-' && argv[1][1] =='d') {
+        if(argv[1][0] == '-' && argv[1][1] ='d') {
             dateSort();
             std::cout << std::endl;
             return 0;
