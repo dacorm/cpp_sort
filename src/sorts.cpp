@@ -31,32 +31,6 @@ void numberSort(int arr[], int l, int r) {
     }
 }
 
-void rmassSort() {
-    int len;
-    while(true) {
-        std::cout << "Number of sorted numbers: ";
-        std::cin >> len;
-        if(len > 0) {
-            break;
-        }
-        std::cout << "Incorrect input" << std::endl;
-    }
-
-    int *arr = new int[len];
-
-    for(int i = 0; i < len; i++) {
-        std::cin >> arr[i];
-    }
-
-    numberSort(arr, 0, len - 1);
-
-    std::cout << "Sorted array:" << std::endl;
-
-    for(int i = len - 1; i > -1; i--) {
-        std::cout << arr[i];
-    }
-}
-
 void massSort() {
     int len;
     while(true) {
