@@ -12,6 +12,10 @@ int main(int argc, char* argv[]) {
             massSort();
             return 0;
         }
+        if(argv[1][0] == '-' && argv[1][1] == 'r' && argv[1][2] =='c') {
+            rmassSort();
+            return 0;
+        }
         printHelp();
     }
     return 0;
